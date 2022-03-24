@@ -1,0 +1,18 @@
+for i = 1,16 do
+    local data = turtle.getItemDetail(i)
+    if (data ~= nil) then
+        print("Item Name: ", data.name)
+        if (data.name == "minecraft:diamond") then
+            if (data.count > 1) then
+                print(data.count,"Diamonds found")
+            else
+                print(data.count,"Diamond found")
+            end
+        end
+    end
+    turtle.select(i)
+    if turtle.refuel(0) then
+        print(i)
+        turtle.refuel()
+    end
+end

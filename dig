@@ -1,0 +1,132 @@
+-- Build Tools
+-- dig v1
+
+local args = { ... }
+
+if args[1] == nil or args[2] == nil or args[3] == nil or turtle.getItemCount(1) < 1 or args[1] == "help" then
+  print ("Usage: dig [forward length] [right length] [depth]")
+  print ("Put an ender chest in the first slot")
+  return
+end
+
+local tilt = 0
+local flength = tonumber(args[1])
+local rlength = tonumber(args[2])
+local depth = tonumber(args[3])
+local blocks = rlength * flength * depth
+
+if turtle.getFuelLevel() < blocks + rlength + flength + depth and args[4] ~= "-f" then
+  print ("You do not have enough fuel. This job needs ", fuelreq, " fuel.")
+  print ("Add more fuel, or append -f to dig anyway.")
+  return
+end
+
+function step()
+  while not turtle.forward() do
+    turtle.dig()
+  end
+end
+
+function stepUp()
+  while not turtle.up() do
+    turtle.digUp()
+  end
+end
+
+function stepDown()
+  while not turtle.down() do
+    turtle.digDown()
+  end
+end
+
+function placeUp()
+  while not turtle.placeUp() do
+    turtle.digUp()
+  end
+end
+
+function rotateRight()
+  turtle.turnRight()
+  if vertical then
+    stepUp()
+  else
+    step()
+  end
+  turtle.turnRight()
+end
+
+function rotateLeft()
+  turtle.turnLeft()
+  if vertical then
+    stepUp()
+  else
+    step()
+  end
+  turtle.turnLeft()
+end
+
+-- Dump inventory into ender chest.
+function dump()
+  turtle.select(1)
+  placeUp()
+  for m = 2, 16, 1 do
+    turtle.select(m)
+    turtle.dropUp()
+  end
+  turtle.select(1)
+  turtle.digUp()
+end
+
+-- Dig 'em up.
+for i = 1, depth, 1 do
+  for j = 1, rlength, 1 do
+    for k = 1, flength, 1 do
+      if turtle.getItemCount(16) > 1 then
+        dump()
+      end
+      turtle.digDown()
+      if k < flength then
+        step()
+      end
+    end
+    if j < rlength then
+      if (j + tilt) % 2 ~= 0 then
+        rotateRight()
+      else
+        rotateLeft()
+      end
+    end
+  end
+  if rlength % 2 == 0 and i % 2 ~= 0 then
+    tilt = 1
+  else
+    tilt = 0
+  end
+  turtle.turnRight()
+  turtle.turnRight()
+  stepDown()
+end
+
+-- Raise to initial height.
+for i = 1, depth, 1 do
+  stepUp()
+end
+
+-- Return to origin.
+if depth % 2 ~= 0 then
+  if rlength % 2 == 0 then
+    turtle.turnLeft()
+    for i = 1, rlength - 1, 1 do
+      step()
+    end
+  else
+    turtle.turnRight()
+    for i = 1, rlength - 1, 1 do
+      step()
+    end
+    turtle.turnLeft()
+    for i = 1, flength - 1, 1 do
+      step()
+    end
+  end
+end
