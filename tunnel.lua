@@ -1,8 +1,9 @@
 local args = { ... }
 local time = args[1]
+local veniminer = loadfile("./scripts/mining/veinminer.lua")
 
 for i = 1,tonumber(time) do
-    dofile("./scripts/mining/locate.lua")
+    veniminer()
     if turtle.detect() then
         turtle.dig()
     end
